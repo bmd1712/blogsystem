@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title', 5000);
             $table->text('content');
-            $table->string('thumbnail', 500)->nullable();
+            $table->string('image', 500)->nullable();
             $table->integer('view_count')->default(0);
             $table->integer('like_count')->default(0);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
