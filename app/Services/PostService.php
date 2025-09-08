@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\PostRepository;
+use App\Repositories\PostViewRepository;
 use App\Services\TagService;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,16 +11,34 @@ class PostService
 {
     protected $postRepository;
     protected $tagService;
+    protected $postViewRepository;
 
-    public function __construct(PostRepository $postRepository, TagService $tagService)
-    {
+    public function __construct(
+        PostRepository $postRepository,
+        TagService $tagService,
+        PostViewRepository $postViewRepository
+    ) {
         $this->postRepository = $postRepository;
         $this->tagService = $tagService;
+        $this->postViewRepository = $postViewRepository;
     }
 
-    public function getAllPosts()
+    public function getAllPosts($perPage = 10)
     {
-        return $this->postRepository->getAll();
+        return $this->postRepository->getAll($perPage);
+    }
+
+    public function getUnreadPosts($perPage = 10)
+    {
+        $userId = Auth::id();
+        $readIds = $this->postViewRepository->getReadPostIds($userId);
+
+        return $this->postRepository->getUnreadPosts($readIds, $perPage);
+    }
+
+    public function getUserPosts($userId, $perPage = 10)
+    {
+        return $this->postRepository->getUserPosts($userId, $perPage);
     }
 
     public function getPostById($id)
@@ -29,8 +48,7 @@ class PostService
 
     public function createPost(array $data, array $tags = [])
     {
-        // Gán user_id cho post
-        $data['user_id'] = Auth::id(); 
+        $data['user_id'] = Auth::id();
 
         $post = $this->postRepository->create($data);
 

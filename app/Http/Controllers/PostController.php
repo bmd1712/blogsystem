@@ -4,10 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Services\PostService;
 use Illuminate\Http\Request;
-use App\Models\Post;
-use App\Models\Tag;
-use App\Models\Category;
-
 
 class PostController extends Controller
 {
@@ -17,14 +13,28 @@ class PostController extends Controller
     {
         $this->postService = $postService;
     }
-
-    // GET /api/posts
-    public function index()
+    
+    public function feed(Request $request)
     {
-        return response()->json($this->postService->getAllPosts());
+        $limit = $request->query('limit', 10);
+        return response()->json(
+            $this->postService->getAllPosts($limit)
+        );
     }
 
-    // GET /api/posts/{id}
+    public function newsfeed(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        return response()->json($this->postService->getUnreadPosts($perPage));
+    }
+
+    // GET /api/users/{userId}/posts
+    public function userPosts(Request $request, $userId)
+    {
+        $perPage = $request->input('per_page', 10);
+        return response()->json($this->postService->getUserPosts($userId, $perPage));
+    }
+
     public function show($id)
     {
         return response()->json($this->postService->getPostById($id));
@@ -41,12 +51,10 @@ class PostController extends Controller
             'tags'        => 'nullable|array',
         ]);
 
-        // Xử lý image
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('posts', 'public');
         }
 
-        // Gọi service -> service sẽ tự gán user_id = Auth::id()
         $post = $this->postService->createPost($validated, $request->input('tags', []));
 
         return response()->json([
@@ -55,22 +63,19 @@ class PostController extends Controller
         ], 201);
     }
 
-    // PUT /api/posts/{id}
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'title'       => 'sometimes|string|max:5000',
             'content'     => 'sometimes|string',
             'image'       => 'nullable|string|max:500',
-            'user_id'     => 'sometimes|exists:users,id',
             'category_id' => 'nullable|exists:categories,id',
         ]);
 
-        $post = $this->postService->updatePost($id, $validated);
+        $post = $this->postService->updatePost($id, $validated, $request->input('tags', []));
         return response()->json($post);
     }
 
-    // DELETE /api/posts/{id}
     public function destroy($id)
     {
         $this->postService->deletePost($id);
