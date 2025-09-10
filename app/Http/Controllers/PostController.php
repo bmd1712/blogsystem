@@ -59,16 +59,16 @@ class PostController extends Controller
 
         return response()->json([
             'message' => 'Bài viết đã được tạo thành công',
-            'data'    => $post,
+            // 'data'    => $post,
         ], 201);
     }
 
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'title'       => 'sometimes|string|max:5000',
+            'title'       => 'sometimes|string|max:255',
             'content'     => 'sometimes|string',
-            'image'       => 'nullable|string|max:500',
+            'image'       => 'nullable|string|max:2048',
             'category_id' => 'nullable|exists:categories,id',
         ]);
 

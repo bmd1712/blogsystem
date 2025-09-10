@@ -54,7 +54,7 @@ class PostRepository
      */
     public function getUserPosts($userId, $perPage = 10)
     {
-        return Post::with(['category', 'tags'])
+        return Post::with(['category', 'tags', 'user'])
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);

@@ -40,3 +40,5 @@ Route::middleware('auth:sanctum')->group(function () {
 // -------------------- PUBLIC ROUTES --------------------
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/tags', [TagController::class, 'index']);
+Route::get('/users/{userId}/posts', [PostController::class, 'userPosts']);
+//Route::get('/testfeed', [PostController::class, 'feed']);             // tất cả
