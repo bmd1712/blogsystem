@@ -22,6 +22,7 @@ class PostController extends Controller
         );
     }
 
+    //post view
     public function newsfeed(Request $request)
     {
         $perPage = $request->input('per_page', 10);

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Post extends Model
 {
     protected $fillable = [
@@ -33,5 +33,16 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class, 'post_tag', 'post_id', 'tag_id')
                     ->withTimestamps();
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    // quan hệ với bảng post_likes
+    public function likes(): HasMany
+    {
+        return $this->hasMany(PostLike::class, 'post_id');
     }
 } 
